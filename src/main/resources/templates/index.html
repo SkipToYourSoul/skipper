@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
+    <title>监控主页</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+
+    <!-- messenger -->
+    <link rel="stylesheet" href="messenger/messenger.css"/>
+    <link rel="stylesheet" href="messenger/messenger-theme-future.css"/>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css"/>
+
+    <!-- Custom styles for this page -->
+    <link rel="stylesheet" href="css/dashboard.css"/>
+</head>
+<body>
+    <!--nav bar-->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="./"><strong>无线网多跳温湿度监控系统</strong></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a th:text="|当前登录用户: ${name}|"></a></li>
+                    <li><a href="/logout">注销</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- main content -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li class="active"><a href="./"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> 监控页面</a></li>
+                    <li class=""><a href="./config"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> 配置页面</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <h2 class="sub-header">
+                    <span class="glyphicon glyphicon-list" aria-hidden="true"></span> 传感器监控页面
+                </h2>
+
+                <div class="row sensor-container">
+                    <div class="col-md-3">
+                        <button class="btn btn-info btn-block">开始</button>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="selectpicker" data-width="100%">
+                            <optgroup label="数据读取间隔">
+                                <option value="30">30秒</option>
+                                <option value="60">60秒</option>
+                                <option value="300">300秒</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="sensor-info">当前传感器数量：<mark th:text="${count}"></mark></div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="sensor-info">当前数据读取间隔：<mark>30</mark>秒</div>
+                    </div>
+                </div>
+
+                <th:block th:if="${not #lists.isEmpty(status)}">
+                    <th:block th:each="status_info,index:${status}">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="sensor-title">传感器编号: <mark th:text="${status_info.address}"></mark></div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="col-md-3">
+                                    <div class="sensor-sub-title">当前温度: <strong class="sensor-data" th:id="|sensor-temp-${status_info.address}|">-</strong></div>
+                                    <div class="sensor-sub-title">当前湿度: <strong class="sensor-data" th:id="|sensor-humi-${status_info.address}|">-</strong></div>
+                                    <div class="sensor-sub-title">温度预警范围: <strong class="sensor-data" th:text="|${status_info.lowertemp}°C - ${status_info.uppertemp}°C|"></strong></div>
+                                    <div class="sensor-sub-title">湿度预警范围: <strong class="sensor-data" th:text="|${status_info.lowerhumi}% - ${status_info.upperhumi}%|"></strong></div>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="sensor-chart" th:id="|sensor-chart-${status_info.address}|">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                </th:block>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- messenger -->
+    <script src="messenger/messenger.min.js"></script>
+    <script src="messenger/messenger-theme-future.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+
+    <!-- echarts -->
+    <script src="js/echarts.common.min.js"></script>
+    <script src="js/shine.js"></script>
+
+    <script src="js/sensor-show.js"></script>
+</body>
+</html>

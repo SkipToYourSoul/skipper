@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Login</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+
+    <!-- form validation -->
+    <link rel="stylesheet" href="validation/formValidation.min.css"/>
+
+    <link rel="stylesheet" href="css/login.css"/>
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <div id="output"></div>
+            <div class="avatar"></div>
+            <div class="form-box">
+                <form id="login_form">
+                    <div class="form-group">
+                        <input name="account" type="text" placeholder="username"/>
+                    </div>
+                    <input name="password" type="password" placeholder="password"/>
+                    <button type="button" class="btn btn-info btn-block login" onclick="$('#login_form').submit()">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- form validation -->
+    <script src="validation/formValidation.min.js"></script>
+    <script src="validation/bootstrap.min.js"></script>
+
+    <script>
+        $('#login_form').formValidation({
+            framework: 'bootstrap',
+            fields: {
+                account: { validators: { notEmpty: { message: 'The user_name is required'} } }
+            }
+        }).on('success.form.fv', function(evt) {
+            evt.preventDefault();
+
+            var parameters = $(this).serialize();
+            $.ajax({
+                type: "POST",
+                url: "/loginPost",
+                data: parameters,
+                error: function(error_message) {
+                    error_message("Server Error")
+                },
+                success: function(data) {
+                    if (data.success == true)
+                        window.location.href = '/';
+                    else{
+                        error_message("Password Error")
+                    }
+                }
+            });
+        }).on('err.form.fv', function (evt) {
+            error_message("Server Error")
+        });
+
+        function error_message(message) {
+            $("#output").addClass("alert alert-danger animated fadeInUp").html("<strong>" + message + "</strong>");
+            $(".avatar").css({
+                "background-image": "url(../cry.jpg)"
+            });
+        }
+    </script>
+</body>
+</html>

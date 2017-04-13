@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="messenger/messenger-theme-future.css"/>
 
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css"/>
+    <link rel="stylesheet" href="css/bootstrap-select.min.css"/>
 
     <!-- Custom styles for this page -->
     <link rel="stylesheet" href="css/dashboard.css"/>
@@ -52,23 +52,24 @@
                 </h2>
 
                 <div class="row sensor-container">
-                    <div class="col-md-3">
-                        <button class="btn btn-info btn-block">开始</button>
+                    <div class="col-md-3 col-sm-3">
+                        <button class="btn btn-info btn-block" id="start-btn">开始监控</button>
                     </div>
-                    <div class="col-md-2">
-                        <select class="selectpicker" data-width="100%">
+                    <div class="col-md-2 col-sm-2">
+                        <select class="selectpicker" data-width="100%" id="interval-select">
                             <optgroup label="数据读取间隔">
+                                <option value="5">5秒</option>
                                 <option value="30">30秒</option>
                                 <option value="60">60秒</option>
                                 <option value="300">300秒</option>
                             </optgroup>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 col-sm-3">
                         <div class="sensor-info">当前传感器数量：<mark th:text="${count}"></mark></div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="sensor-info">当前数据读取间隔：<mark>30</mark>秒</div>
+                    <div class="col-md-3 col-sm-3">
+                        <div class="sensor-info">当前数据读取间隔：<mark id="interval-time">5</mark>秒</div>
                     </div>
                 </div>
 
@@ -79,13 +80,21 @@
                                 <div class="sensor-title">传感器编号: <mark th:text="${status_info.address}"></mark></div>
                             </div>
                             <div class="panel-body">
-                                <div class="col-md-3">
+                                <div class="col-md-3 col-sm-3">
                                     <div class="sensor-sub-title">当前温度: <strong class="sensor-data" th:id="|sensor-temp-${status_info.address}|">-</strong></div>
                                     <div class="sensor-sub-title">当前湿度: <strong class="sensor-data" th:id="|sensor-humi-${status_info.address}|">-</strong></div>
-                                    <div class="sensor-sub-title">温度预警范围: <strong class="sensor-data" th:text="|${status_info.lowertemp}°C - ${status_info.uppertemp}°C|"></strong></div>
-                                    <div class="sensor-sub-title">湿度预警范围: <strong class="sensor-data" th:text="|${status_info.lowerhumi}% - ${status_info.upperhumi}%|"></strong></div>
+                                    <div class="sensor-sub-title">
+                                        温度预警范围:
+                                        <strong class="sensor-threshold-data" th:id="|sensor-temp-lower-${status_info.address}|" th:text="|${status_info.lowertemp}|"></strong>°C -
+                                        <strong class="sensor-threshold-data" th:id="|sensor-temp-upper-${status_info.address}|" th:text="|${status_info.uppertemp}|"></strong>°C
+                                    </div>
+                                    <div class="sensor-sub-title">
+                                        湿度预警范围:
+                                        <strong class="sensor-threshold-data" th:id="|sensor-humi-lower-${status_info.address}|" th:text="|${status_info.lowerhumi}|"></strong>% -
+                                        <strong class="sensor-threshold-data" th:id="|sensor-humi-upper-${status_info.address}|" th:text="|${status_info.upperhumi}|"></strong>%
+                                    </div>
                                 </div>
-                                <div class="col-md-9">
+                                <div class="col-md-9 col-sm-9">
                                     <div class="sensor-chart" th:id="|sensor-chart-${status_info.address}|">
                                     </div>
                                 </div>
@@ -106,11 +115,14 @@
     <script src="messenger/messenger-theme-future.js"></script>
 
     <!-- Latest compiled and minified JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+    <script src="js/bootstrap-select.min.js"></script>
 
     <!-- echarts -->
     <script src="js/echarts.common.min.js"></script>
-    <script src="js/shine.js"></script>
+    <script src="js/echart-theme/infographic.js"></script>
+    <script src="js/echart-theme/shine.js"></script>
+    <script src="js/echart-theme/roma.js"></script>
+    <script src="js/echart-theme/vintage.js"></script>
 
     <script src="js/sensor-show.js"></script>
 </body>

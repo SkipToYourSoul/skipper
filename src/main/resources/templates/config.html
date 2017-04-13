@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
+    <title>配置页面</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+
+    <!-- messenger -->
+    <link rel="stylesheet" href="messenger/messenger.css"/>
+    <link rel="stylesheet" href="messenger/messenger-theme-future.css"/>
+
+    <!-- bootstrap table -->
+    <link rel="stylesheet" href="table/bootstrap-table.min.css"/>
+
+    <!-- form validation -->
+    <link rel="stylesheet" href="validation/formValidation.min.css"/>
+
+    <!-- Custom styles for this page -->
+    <link rel="stylesheet" href="css/dashboard.css"/>
+</head>
+<body>
+    <!--nav bar-->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="./"><strong>无线网多跳温湿度监控系统</strong></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a th:text="|当前登录用户: ${name}|"></a></li>
+                    <li><a href="/logout">注销</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- main content -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li class=""><a href="./"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> 监控页面</a></li>
+                    <li class="active"><a href="./config"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> 配置页面</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <h2 class="sub-header">
+                    <span class="glyphicon glyphicon-list" aria-hidden="true"></span> 传感器配置页面
+                </h2>
+                <div class="col-md-12 col-sm-12">
+                    <div id="toolbar">
+                        <button class="btn btn-success" onclick="status_change()">打开／关闭传感器</button>
+                        <button class="btn btn-warning" data-toggle="modal" data-target="#formModel">新增／修改传感器信息</button>
+                    </div>
+                    <table id="sensor-table"
+                           data-id-field="address"
+                           data-toolbar="#toolbar"
+                           data-search="true"
+                           data-show-refresh="true"
+                           data-click-to-select="true"
+                           data-show-pagination-switch="true"
+                           data-pagination="true"
+                           data-page-size="5"
+                           data-page-list="[5, 10, ALL]"
+                           data-pagination-first-text="First"
+                           data-pagination-pre-text="Previous"
+                           data-pagination-next-text="Next"
+                           data-pagination-last-text="Last">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- form modal -->
+    <div class="modal fade" id="formModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">配置传感器</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <form class="form-horizontal" role="form" id="sensor-form">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">传感器编号</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="address" id="address"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">预警温度下限值</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="lower-temp" id="lower-temp"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">预警温度上限值</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="upper-temp" id="upper-temp"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">预警湿度下限值</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="lower-humi" id="lower-humi"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">预警湿度上限值</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="upper-humi" id="upper-humi"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8 col-sm-offset-3">
+                                    <button type="button" class="btn btn-success btn-block" onclick="$('#sensor-form').submit()">
+                                        修改配置
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- messenger -->
+    <script src="messenger/messenger.min.js"></script>
+    <script src="messenger/messenger-theme-future.js"></script>
+
+    <!-- bootstrap table -->
+    <script src="table/bootstrap-table.min.js"></script>
+
+    <!-- form validation -->
+    <script src="validation/formValidation.min.js"></script>
+    <script src="validation/bootstrap.min.js"></script>
+
+    <script src="js/sensor-config.js"></script>
+
+</body>
+</html>

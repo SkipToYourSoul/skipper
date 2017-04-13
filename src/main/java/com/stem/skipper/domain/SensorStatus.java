@@ -66,4 +66,15 @@ public class SensorStatus {
     public void setLowerhumi(int lowerhumi) {
         this.lowerhumi = lowerhumi;
     }
+
+    public SensorStatus(String address, int status, int uppertemp, int lowertemp, int upperhumi, int lowerhumi) {
+        this.address = address;
+        this.status = status;
+        this.uppertemp = uppertemp;
+        this.lowertemp = lowertemp;
+        this.upperhumi = upperhumi;
+        this.lowerhumi = lowerhumi;
+    }
+
+    public SensorStatus(){}
 }

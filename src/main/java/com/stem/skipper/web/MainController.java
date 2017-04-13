@@ -33,6 +33,13 @@ public class MainController {
         return "index";
     }
 
+    @GetMapping("/config")
+    public String config(@SessionAttribute(WebSecurityConfig.SESSION_KEY) String account, Model model){
+        model.addAttribute("name", account);
+
+        return "config";
+    }
+
     @GetMapping("/login")
     public String login(){
         return "login";

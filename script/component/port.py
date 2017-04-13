@@ -6,6 +6,7 @@ Description: some basic operation of port
 """
 try:
     import serial
+    import configparser
 except ImportError:
     import sys
     print(sys.stderr, """ !!!
@@ -17,15 +18,21 @@ except ImportError:
     It's possible that the above module doesn't match the current version of Python, which is:
     %s
 
-    """) % (sys.exc_info(), sys.version)
+    """ % (sys.exc_info(), sys.version))
     sys.exit(1)
 
 
 class SkipperPort:
-    def __init__(self, port="COM4", baudrate=115200, timeout=2):
-        self.port = port
-        self.baudrate = baudrate
-        self.timeout = timeout
+    conf_path = "../common.conf"
+    conf_section = "port"
+    timeout = 3
+
+    def __init__(self, port="COM4"):
+        config_file = configparser.ConfigParser()
+        config_file.read(self.conf_path, "utf-8")
+
+        self.port = config_file.get(self.conf_section, 'port')
+        self.baudrate = config_file.get(self.conf_section, 'baudrate')
         self.ser = None
 
     def start_port(self):

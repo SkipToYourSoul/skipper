@@ -133,9 +133,14 @@ body {
   text-align: left;
 }
 
-.sensor-data{
+.sensor-threshold-data{
   font-size: 20px;
   color: #ff5a00;
+}
+
+.sensor-data{
+  font-size: 20px;
+  color: #5c5b5b;
 }
 
 .sensor-chart{

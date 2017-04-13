@@ -6,6 +6,7 @@ Description: some basic operation with db
 """
 try:
     import pymysql
+    import configparser
 except ImportError:
     import sys
     print(sys.stderr, """ !!!
@@ -17,19 +18,27 @@ except ImportError:
     It's possible that the above module doesn't match the current version of Python, which is:
     %s
 
-    """) % (sys.exc_info(), sys.version)
+    """ % (sys.exc_info(), sys.version))
     sys.exit(1)
 
 
 class MySQL(object):
-    def __init__(self):
-        MYSQL_HOST = "jy.ups.w.qiyi.db"
-        MYSQL_PORT = 8703
-        MYSQL_USER = "ups"
-        MYSQL_PASSWD = "KexTUsXX"
-        MYSQL_DB_NAME = "test"
+    conf_path = "../common.conf"
+    conf_section = "mysql-local"
 
-        self.conn = pymysql.connect(host=MYSQL_HOST, port=MYSQL_PORT, user=MYSQL_USER, passwd=MYSQL_PASSWD, db=MYSQL_DB_NAME)
+    def __init__(self):
+        config_file = configparser.ConfigParser()
+        config_file.read(self.conf_path, "utf-8")
+
+        self.MYSQL_HOST = config_file.get(self.conf_section, 'host')
+        self.MYSQL_PORT = config_file.get(self.conf_section, 'port')
+        self.MYSQL_USER = config_file.get(self.conf_section, 'user')
+        self.MYSQL_PASSWD = config_file.get(self.conf_section, 'password')
+        self.MYSQL_DB_NAME = config_file.get(self.conf_section, 'db')
+
+        self.conn = pymysql.connect(host=self.MYSQL_HOST, port=self.MYSQL_PORT,
+                                    user=self.MYSQL_USER, passwd=self.MYSQL_PASSWD, db=self.MYSQL_DB_NAME)
+        print("Open database {0} successful...".format(self.conf_section))
 
     def get_cursor(self):
         return self.conn.cursor()

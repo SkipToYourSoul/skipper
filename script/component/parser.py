@@ -9,29 +9,30 @@ import binascii
 
 class SkipperParser:
     @staticmethod
-    def parser_info(port_line):
-        # transfer port_line to str
-        hex_str = binascii.b2a_hex(port_line).decode()
+    def parser_info(port_line_list):
+        data_length = 16
+        for port_line in port_line_list:
+            # transfer port_line to str
+            hex_str = binascii.b2a_hex(port_line).decode()
 
-        if not hex_str.endswith("ff"):
-            print("Error information: %s" % hex_str)
-            raise Exception('Error Information From Port.')
+            if not hex_str.endswith("ff"):
+                print("Error information: %s" % hex_str)
+                raise Exception('Error Information From Port.')
 
-        info = {}
-        for recorder in hex_str.split("ff"):
-            if recorder != "":
-                data_length = recorder[2:4]
-                send_port = recorder[4:6]
-                receive_port = recorder[6:8]
-                ln_address = recorder[10:12] + recorder[8:10]
-                data = int(recorder[12:], 16)
-                info[ln_address + "#" + receive_port] = {
-                    "data_length": data_length,
-                    "send_port": send_port,
-                    "receive_port": receive_port,
-                    "ln_address": ln_address,
-                    "data": data
-                }
+            info = {}
+            for position in range(0, len(hex_str), data_length):
+                recorder = hex_str[position: position + data_length]
+                if recorder != "":
+                    send_port = recorder[4:6]
+                    receive_port = recorder[6:8]
+                    ln_address = recorder[10:12] + recorder[8:10]
+                    data = int(recorder[12:14], 16)
+                    info[ln_address + "#" + receive_port] = {
+                        "send_port": send_port,
+                        "receive_port": receive_port,
+                        "ln_address": ln_address,
+                        "data": data
+                    }
         return info
 
     @staticmethod

@@ -7,6 +7,7 @@ Description: some basic operation of port
 try:
     import serial
     import configparser
+    import os
 except ImportError:
     import sys
     print(sys.stderr, """ !!!
@@ -23,16 +24,20 @@ except ImportError:
 
 
 class SkipperPort:
-    conf_path = "../common.conf"
+    conf_path = "./common.conf"
     conf_section = "port"
-    timeout = 3
+    timeout = 0
 
     def __init__(self, port="COM4"):
+        if not os.path.exists(self.conf_path):
+            print("Error config file path.")
+            return
+
         config_file = configparser.ConfigParser()
         config_file.read(self.conf_path, "utf-8")
 
         self.port = config_file.get(self.conf_section, 'port')
-        self.baudrate = config_file.get(self.conf_section, 'baudrate')
+        self.baudrate = int(config_file.get(self.conf_section, 'baudrate'))
         self.ser = None
 
     def start_port(self):

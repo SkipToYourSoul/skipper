@@ -7,33 +7,44 @@ Description: Run to monitor serial and insert data into mysql
 
 import script.component as component
 import traceback
-from time import strftime, gmtime
+from time import strftime, localtime
 
 # ---- db settings
-skipper_info_tbl = "skipper"
+skipper_data_tbl = "skipper"
+skipper_info_tbl = "skipper_info"
+skipper_status_tbl = "skipper_status"
+
+# --- basic tools
+parser = component.SkipperParser()
+port = component.SkipperPort()
+db = component.MySQL("mysql-jy")
 
 # ---- insert settings
-INSERT_INTERVAL = 3
+sensor_count = db.query("SELECT count(*) FROM " + skipper_status_tbl + " WHERE status = 1")[0][0]
+db_circle = 4
+INSERT_INTERVAL = sensor_count*2*db_circle
 
 
 def starter():
-    parser = component.SkipperParser()
-    port = component.SkipperPort()
-    db = component.MySQL()
     ser = port.start_port()
-
     merge_info = {}
     insert_interval = INSERT_INTERVAL
+
+    # --- recorder start time
+    sql = "INSERT INTO " + skipper_info_tbl + " (time) VALUES ('" + strftime("%Y-%m-%d %H:%M:%S", localtime()) + "')"
+    db.execute(sql)
 
     while True:
         if ser.inWaiting() > 0:
             try:
                 # parser info
-                info = parser.parser_info(ser.readline())
+                info = parser.parser_info(ser.readlines())
+                print(info)
 
                 # merge info
-                for key, value in info:
+                for key, value in info.items():
                     merge_info[key] = value
+                print(merge_info)
 
                 if insert_interval > 0:
                     insert_interval -= 1
@@ -45,7 +56,7 @@ def starter():
                     db_data = parser.transfer_to_db_format(merge_info)
 
                     # insert to mysql
-                    sql = "INSERT INTO " + skipper_info_tbl + \
+                    sql = "INSERT INTO " + skipper_data_tbl + \
                           " (address, send_port, receive_port, value) values (%s, %s, %s, %s)"
                     db.executemany(sql, db_data)
 
@@ -53,7 +64,8 @@ def starter():
                     insert_interval = INSERT_INTERVAL
                     merge_info.clear()
 
-                    print("Insert data into db at %s." % strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+                    time = strftime("%Y-%m-%d %H:%M:%S", localtime())
+                    print("Insert data into db at %s\n %s" % (time, db_data))
             except Exception as e:
                 traceback.print_exc(e)
 

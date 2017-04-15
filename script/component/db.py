@@ -7,6 +7,7 @@ Description: some basic operation with db
 try:
     import pymysql
     import configparser
+    import os
 except ImportError:
     import sys
     print(sys.stderr, """ !!!
@@ -23,15 +24,20 @@ except ImportError:
 
 
 class MySQL(object):
-    conf_path = "../common.conf"
+    conf_path = "./common.conf"
     conf_section = "mysql-local"
 
-    def __init__(self):
+    def __init__(self, conf_section):
+        if not os.path.exists(self.conf_path):
+            print("Error config file path.")
+            return
+
+        self.conf_section = conf_section
         config_file = configparser.ConfigParser()
         config_file.read(self.conf_path, "utf-8")
 
         self.MYSQL_HOST = config_file.get(self.conf_section, 'host')
-        self.MYSQL_PORT = config_file.get(self.conf_section, 'port')
+        self.MYSQL_PORT = int(config_file.get(self.conf_section, 'port'))
         self.MYSQL_USER = config_file.get(self.conf_section, 'user')
         self.MYSQL_PASSWD = config_file.get(self.conf_section, 'password')
         self.MYSQL_DB_NAME = config_file.get(self.conf_section, 'db')

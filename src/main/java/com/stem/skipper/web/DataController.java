@@ -1,9 +1,12 @@
 package com.stem.skipper.web;
 
 import com.stem.skipper.domain.SensorStatus;
+import com.stem.skipper.web.bean.SensorDetailInfo;
+import com.stem.skipper.web.bean.SensorSimpleInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,16 +19,39 @@ public class DataController {
     @Autowired
     DataService service;
 
+    /**
+     * newest sensor info
+     * @return address, temperature, humidity, timestamp
+     */
     @GetMapping(value = "/sensor/data")
-    List<DataService.SensorInfoBean> getSensorInfo(){
+    List<SensorSimpleInfo> getSensorInfo(){
         return service.findOnlineSensorInfo();
     }
 
+    /**
+     * all sensor config status
+     * @return
+     */
     @GetMapping(value = "/sensor/status")
     List<SensorStatus> getSensorStatus(){
         return service.findAllSensorStatus();
     }
 
+    @GetMapping(value = "/sensor/overview/data")
+    List<SensorDetailInfo> getDetailSensorInfo(@RequestParam String dataTime, @RequestParam String dataInterval){
+        try {
+            return service.findOnlineDetailInfo(dataTime, dataInterval);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * update sensor status
+     * @param queryParams
+     * @return
+     */
     @PostMapping(value = "/sensor/status/save/switch")
     String switchSensorStatus(@RequestParam Map<String, String> queryParams){
         try {
@@ -37,6 +63,11 @@ public class DataController {
         return "success";
     }
 
+    /**
+     * insert or update sensor status info
+     * @param queryParams
+     * @return
+     */
     @PostMapping(value = "/sensor/status/save/modify")
     String modifySensorStatus(@RequestParam Map<String, String> queryParams){
         String message = "";

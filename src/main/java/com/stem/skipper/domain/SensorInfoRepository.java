@@ -9,4 +9,6 @@ import java.util.List;
  */
 public interface SensorInfoRepository extends JpaRepository<SensorInfo, Integer> {
     List<SensorInfo> findTop2ByAddress(String address);
+
+    List<SensorInfo> findByAddressAndTimestampGreaterThanEqualOrderByTimestampDesc(String address, String timestamp);
 }

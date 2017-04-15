@@ -16,7 +16,7 @@ public class SensorInfo {
     private String address;
     private String send_port;
     private String receive_port;
-    private int value;
+    private double value;
     private String timestamp;
 
     public int getId() {
@@ -51,7 +51,7 @@ public class SensorInfo {
         this.receive_port = receive_port;
     }
 
-    public int getValue() {
+    public double getValue() {
         return value;
     }
 
@@ -65,5 +65,17 @@ public class SensorInfo {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "SensorInfo{" +
+                "id=" + id +
+                ", address='" + address + '\'' +
+                ", send_port='" + send_port + '\'' +
+                ", receive_port='" + receive_port + '\'' +
+                ", value=" + value +
+                ", timestamp='" + timestamp + '\'' +
+                '}';
     }
 }

@@ -4,10 +4,16 @@ import com.stem.skipper.domain.SensorInfo;
 import com.stem.skipper.domain.SensorInfoRepository;
 import com.stem.skipper.domain.SensorStatus;
 import com.stem.skipper.domain.SensorStatusRepository;
+import com.stem.skipper.web.bean.SensorDetailInfo;
+import com.stem.skipper.web.bean.SensorSimpleInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +30,9 @@ public class DataService {
 
     private static final String temperaturePort = "a0";
     private static final String humidityPort = "a1";
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private DecimalFormat valueFormat = new DecimalFormat("#.00");
 
     public int findOnlineSensorCount(){
         return sensorStatusRepository.countByStatus(1);
@@ -87,56 +96,148 @@ public class DataService {
         return sensorStatuses;
     }
 
-    public List<SensorInfoBean> findOnlineSensorInfo(){
+    /**
+     * find online sensor simple info for config page
+     * @return SensorSimpleInfo list
+     */
+    public List<SensorSimpleInfo> findOnlineSensorInfo(){
         List<SensorStatus> sensorStatuses = sensorStatusRepository.findByStatus(1);
-        List<SensorInfoBean> sensorInfoBeanList = new ArrayList<SensorInfoBean>();
+        List<SensorSimpleInfo> sensorInfoBeanList = new ArrayList<SensorSimpleInfo>();
         for (SensorStatus sensors : sensorStatuses){
             String sensorAddress = sensors.getAddress();
             List<SensorInfo> infoList = sensorInfoRepository.findTop2ByAddress(sensorAddress);
-
-            // merge data
-            String address = infoList.get(0).getAddress();
-            String timeStamp = infoList.get(0).getTimestamp();
-            int temperature = -1;
-            int humidity = -1;
-            for (SensorInfo info: infoList){
-                if (info.getReceive_port().equals(temperaturePort))
-                    temperature = info.getValue();
-                else if (info.getReceive_port().equals(humidityPort))
-                    humidity = info.getValue();
-            }
-            sensorInfoBeanList.add(new SensorInfoBean(address, temperature, humidity, timeStamp));
+            sensorInfoBeanList.add(getSimpleSensorInfo(infoList));
         }
         return sensorInfoBeanList;
     }
 
-    public class SensorInfoBean{
-        private String address;
-        private int temperature;
-        private int humidity;
-        private String timeStamp;
+    private SensorSimpleInfo getSimpleSensorInfo(List<SensorInfo> infoList){
+        // merge data
+        String address = infoList.get(0).getAddress();
+        String timeStamp = infoList.get(0).getTimestamp();
+        double temperature = -1;
+        double humidity = -1;
+        for (SensorInfo info: infoList){
+            if (info.getReceive_port().equals(temperaturePort))
+                temperature = info.getValue();
+            else if (info.getReceive_port().equals(humidityPort))
+                humidity = info.getValue();
+        }
+        return new SensorSimpleInfo(address, temperature, humidity, timeStamp);
+    }
 
-        public SensorInfoBean(String address, int temperature, int humidity, String timeStamp) {
-            this.address = address;
-            this.temperature = temperature;
-            this.humidity = humidity;
-            this.timeStamp = timeStamp;
+    /**
+     * find online detail sensor info for overview page
+     * @param dataTime(min) the begin time of the data range
+     * @param dataInterval(s) the interval time of sample data
+     * @return sensor detail info list
+     * @throws ParseException
+     */
+    public List<SensorDetailInfo> findOnlineDetailInfo(String dataTime, String dataInterval) throws ParseException {
+        // get the online sensor
+        List<SensorStatus> sensorStatuses = sensorStatusRepository.findByStatus(1);
+
+        // the begin time of get data
+        long time = new Date().getTime() - Long.parseLong(dataTime)*60*1000;
+        String date = dateFormat.format(new Date(time));
+
+        // the interval of sample data
+        long interval = Long.parseLong(dataInterval)*1000;
+        List<SensorDetailInfo> sensorDetailInfoList = new ArrayList<SensorDetailInfo>();
+
+        // traverse the online status
+        for (SensorStatus sensors : sensorStatuses) {
+            // get sensor info in recent time order by time desc
+            String sensorAddress = sensors.getAddress();
+            List<SensorInfo> sensorInfoList = sensorInfoRepository.findByAddressAndTimestampGreaterThanEqualOrderByTimestampDesc(sensorAddress, date);
+
+            // merge sensor info to simple info
+            List<SensorSimpleInfo> sensorSimpleInfoList = mergeSimpleSensorInfo(sensorInfoList);
+            if (sensorSimpleInfoList.size() == 0)
+                continue;
+
+            // filter data according to the interval
+            sensorSimpleInfoList = filterSensorInfoAccordingInterval(sensorSimpleInfoList, interval);
+
+            // make simple data to detail data
+            sensorDetailInfoList.add(getDetailInfoAccordingSimpleInfo(sensorSimpleInfoList));
         }
 
-        public String getAddress() {
-            return address;
+        return sensorDetailInfoList;
+    }
+
+    private List<SensorSimpleInfo> mergeSimpleSensorInfo(List<SensorInfo> infoList){
+        List<SensorSimpleInfo> simpleList = new ArrayList<SensorSimpleInfo>();
+        for (int i=0; i<infoList.size(); i+=2){
+            if (i+1 >= infoList.size())
+                break;
+            if (!infoList.get(i).getTimestamp().equals(infoList.get(i+1).getTimestamp()))
+                continue;
+            SensorInfo info = infoList.get(i);
+            String address = info.getAddress();
+            String timeStamp = info.getTimestamp();
+            double temperature = -1.0;
+            double humidity = -1.0;
+            if (info.getReceive_port().equals(temperaturePort)) {
+                temperature = info.getValue();
+                humidity = infoList.get(i+1).getValue();
+            }
+            else if (info.getReceive_port().equals(humidityPort)) {
+                humidity = info.getValue();
+                temperature = infoList.get(i+1).getValue();
+            }
+            simpleList.add(new SensorSimpleInfo(address, temperature, humidity, timeStamp));
+        }
+        return simpleList;
+    }
+
+    private List<SensorSimpleInfo> filterSensorInfoAccordingInterval(List<SensorSimpleInfo> sensorInfoList, long interval) throws ParseException {
+        List<SensorSimpleInfo> list = new ArrayList<SensorSimpleInfo>();
+        long nextTime = dateFormat.parse(sensorInfoList.get(0).getTimeStamp()).getTime();
+        for (SensorSimpleInfo info : sensorInfoList){
+            long currentTime = dateFormat.parse(info.getTimeStamp()).getTime();
+            if (currentTime <= nextTime) {
+                list.add(info);
+                nextTime = currentTime - interval;
+            }
+        }
+        return list;
+    }
+
+    private SensorDetailInfo getDetailInfoAccordingSimpleInfo(List<SensorSimpleInfo> sensorSimpleInfoList){
+        String address = sensorSimpleInfoList.get(0).getAddress();
+        double temperature = sensorSimpleInfoList.get(0).getTemperature();
+        double humidity = sensorSimpleInfoList.get(0).getHumidity();
+        double averageTemperature = 0.0;
+        double averageHumidity = 0.0;
+        double shiftTemperature;
+        double shiftHumidity;
+
+        int size = sensorSimpleInfoList.size();
+        double minTemperature = 100.0;
+        double maxTemperature = 0.0;
+        double minHumidity = 100.0;
+        double maxHumidity = 0.0;
+
+        for (SensorSimpleInfo info: sensorSimpleInfoList){
+            averageTemperature += info.getTemperature();
+            averageHumidity += info.getHumidity();
+            if (info.getTemperature() > maxTemperature)
+                maxTemperature = info.getTemperature();
+            if (info.getTemperature() < minTemperature)
+                minTemperature = info.getTemperature();
+            if (info.getHumidity() > maxHumidity)
+                maxHumidity = info.getHumidity();
+            if (info.getHumidity() < minHumidity)
+                minHumidity = info.getHumidity();
         }
 
-        public int getTemperature() {
-            return temperature;
-        }
+        averageHumidity = averageHumidity/size;
+        averageTemperature = averageTemperature/size;
+        shiftHumidity = maxHumidity - minHumidity;
+        shiftTemperature = maxTemperature - minTemperature;
 
-        public int getHumidity() {
-            return humidity;
-        }
-
-        public String getTimeStamp() {
-            return timeStamp;
-        }
+        return new SensorDetailInfo(address, temperature, humidity, averageTemperature, averageHumidity,
+                shiftTemperature, shiftHumidity, maxTemperature, minTemperature, maxHumidity, minHumidity);
     }
 }

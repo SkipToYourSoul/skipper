@@ -1,0 +1,46 @@
+/**
+/ monitor.css
+ */
+
+.sensor-container{
+  position: relative;
+  margin: 20px auto 20px;
+  text-align: left;
+  background: #fff;
+}
+
+.sensor-info{
+  font-size: 20px;
+  font-weight: 600;
+  color: #9d9d9d;
+  text-align: left;
+}
+
+.sensor-title{
+  font-size: 24px;
+  font-weight: 600;
+  color: #9d9d9d;
+  text-align: left;
+}
+
+.sensor-sub-title{
+  margin: 10px auto 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #9d9d9d;
+  text-align: left;
+}
+
+.sensor-threshold-data{
+  font-size: 20px;
+  color: #ff5a00;
+}
+
+.sensor-data{
+  font-size: 20px;
+  color: #5c5b5b;
+}
+
+.sensor-chart{
+  height: 300px;
+}

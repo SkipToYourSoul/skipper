@@ -1,5 +1,6 @@
 package com.stem.skipper.web;
 
+import com.stem.skipper.domain.SensorInfo;
 import com.stem.skipper.domain.SensorStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,13 +25,20 @@ public class MainController {
     public String index(@SessionAttribute(WebSecurityConfig.SESSION_KEY) String account, Model model){
         model.addAttribute("name", account);
 
+        return "index";
+    }
+
+    @GetMapping("/monitor")
+    public String monitor(@SessionAttribute(WebSecurityConfig.SESSION_KEY) String account, Model model){
+        model.addAttribute("name", account);
+
         List<SensorStatus> sensorStatuses = service.findOnlineSensorStatus();
         int sensorCount = sensorStatuses.size();
 
         model.addAttribute("count", sensorCount);
         model.addAttribute("status", sensorStatuses);
 
-        return "index";
+        return "monitor";
     }
 
     @GetMapping("/config")

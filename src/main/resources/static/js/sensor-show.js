@@ -77,7 +77,7 @@ for (var i = 0; i < $(".sensor-chart").length; i++){
         },
             {
                 name: '当前湿度',
-                type: 'bar',
+                type: 'line',
                 yAxisIndex: 1,
                 data: []
             }]
@@ -94,7 +94,7 @@ for (var i = 0; i < $(".sensor-chart").length; i++){
 function interval_function(){
     $.ajax({
         type: "get",
-        url: window.location.href + "/sensor/data",
+        url: "/sensor/data",
         dataType: "json",
         success: function(sensor_data){
             var sensor_data_map = {};

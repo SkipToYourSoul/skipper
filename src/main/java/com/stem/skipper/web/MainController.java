@@ -1,13 +1,16 @@
 package com.stem.skipper.web;
 
-import com.stem.skipper.domain.SensorInfo;
 import com.stem.skipper.domain.SensorStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import javax.servlet.http.HttpSession;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +25,12 @@ public class MainController {
     DataService service;
 
     @GetMapping("/")
-    public String index(@SessionAttribute(WebSecurityConfig.SESSION_KEY) String account, Model model){
+    public String index(@SessionAttribute(WebSecurityConfig.SESSION_KEY) String account, Model model) throws ParseException {
         model.addAttribute("name", account);
+
+        List<String> result = service.findSensorStartTime();
+        model.addAttribute("start", result.get(0));
+        model.addAttribute("status", result.get(1));
 
         return "index";
     }

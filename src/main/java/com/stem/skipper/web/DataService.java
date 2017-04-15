@@ -1,9 +1,6 @@
 package com.stem.skipper.web;
 
-import com.stem.skipper.domain.SensorInfo;
-import com.stem.skipper.domain.SensorInfoRepository;
-import com.stem.skipper.domain.SensorStatus;
-import com.stem.skipper.domain.SensorStatusRepository;
+import com.stem.skipper.domain.*;
 import com.stem.skipper.web.bean.SensorDetailInfo;
 import com.stem.skipper.web.bean.SensorSimpleInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +25,25 @@ public class DataService {
     @Autowired
     SensorStatusRepository sensorStatusRepository;
 
+    @Autowired
+    SensorStartRepository sensorStartRepository;
+
     private static final String temperaturePort = "a0";
     private static final String humidityPort = "a1";
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private DecimalFormat valueFormat = new DecimalFormat("#.00");
+
+    public List<String> findSensorStartTime() throws ParseException {
+        String startTime = sensorStartRepository.findTopByOrderByTimeDesc().getTime();
+        long interval = new Date().getTime() - dateFormat.parse(startTime).getTime();
+        long hour = interval / 1000 / 3600;
+        long minute = (interval - hour*3600*1000) / 1000 / 60;
+
+        List<String> result = new ArrayList<String>();
+        result.add(String.valueOf(hour) + "小时" + String.valueOf(minute) + "分钟");
+        result.add("记录中");
+        return result;
+    }
 
     public int findOnlineSensorCount(){
         return sensorStatusRepository.countByStatus(1);

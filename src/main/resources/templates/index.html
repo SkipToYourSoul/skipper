@@ -59,29 +59,41 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-3 col-sm-3">
+                            <div class="col-md-2 col-sm-2">
                                 <div class="row text-center overview-title">
                                     温度梯度值
                                 </div>
                                 <div class="row text-center overview-content" id="temp-grad"></div>
                             </div>
-                            <div class="col-md-3 col-sm-3">
+                            <div class="col-md-2 col-sm-2">
                                 <div class="row text-center overview-title">
                                     湿度梯度值
                                 </div>
                                 <div class="row text-center overview-content" id="humi-grad"></div>
                             </div>
-                            <div class="col-md-3 col-sm-3">
+                            <div class="col-md-2 col-sm-2">
                                 <div class="row text-center overview-title">
-                                    当前数据采样时间
+                                    数据采样时间
                                 </div>
                                 <div class="row text-center overview-content" id="data-time"></div>
                             </div>
-                            <div class="col-md-3 col-sm-3">
+                            <div class="col-md-2 col-sm-2">
                                 <div class="row text-center overview-title">
-                                    当前测量时间间隔
+                                    测量时间间隔
                                 </div>
                                 <div class="row text-center overview-content" id="data-interval"></div>
+                            </div>
+                            <div class="col-md-2 col-sm-2">
+                                <div class="row text-center overview-title">
+                                    记录时长
+                                </div>
+                                <div class="row text-center overview-content" id="data-period" th:text="${start}"></div>
+                            </div>
+                            <div class="col-md-2 col-sm-2">
+                                <div class="row text-center overview-title">
+                                    记录状态
+                                </div>
+                                <div class="row text-center overview-content" id="data-status" th:text="${status}"></div>
                             </div>
                         </div>
                     </div>

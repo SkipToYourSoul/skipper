@@ -58,7 +58,7 @@
                         <button class="btn btn-info btn-block" id="start-btn">开始监控</button>
                     </div>
                     <div class="col-md-2 col-sm-2">
-                        <select class="selectpicker" data-width="100%" id="interval-select" title="数据读取间隔">
+                        <select class="selectpicker" data-width="100%" id="interval-select">
                             <optgroup label="数据读取间隔">
                                 <option value="5">5秒</option>
                                 <option value="30">30秒</option>
@@ -92,8 +92,8 @@
                                     </div>
                                     <div class="sensor-sub-title">
                                         湿度预警范围:
-                                        <strong class="sensor-threshold-data" th:id="|sensor-humi-lower-${status_info.address}|" th:text="|${status_info.lowerhumi}|"></strong>% -
-                                        <strong class="sensor-threshold-data" th:id="|sensor-humi-upper-${status_info.address}|" th:text="|${status_info.upperhumi}|"></strong>%
+                                        <strong class="sensor-threshold-data" th:id="|sensor-humi-lower-${status_info.address}|" th:text="|${status_info.lowerhumi}|"></strong>°RH -
+                                        <strong class="sensor-threshold-data" th:id="|sensor-humi-upper-${status_info.address}|" th:text="|${status_info.upperhumi}|"></strong>°RH
                                     </div>
                                 </div>
                                 <div class="col-md-9 col-sm-9">

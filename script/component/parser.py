@@ -26,7 +26,7 @@ class SkipperParser:
                     send_port = recorder[4:6]
                     receive_port = recorder[6:8]
                     ln_address = recorder[10:12] + recorder[8:10]
-                    data = int(recorder[12:14], 16)
+                    data = '%.2f' % float(int(recorder[12:14], 16))
                     info[ln_address + "#" + receive_port] = {
                         "send_port": send_port,
                         "receive_port": receive_port,

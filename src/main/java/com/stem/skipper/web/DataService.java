@@ -2,6 +2,7 @@ package com.stem.skipper.web;
 
 import com.stem.skipper.domain.*;
 import com.stem.skipper.web.bean.SensorDetailInfo;
+import com.stem.skipper.web.bean.SensorDownloadInfo;
 import com.stem.skipper.web.bean.SensorSimpleInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,10 +10,7 @@ import org.springframework.stereotype.Service;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by liye on 2017/3/29.
@@ -32,6 +30,7 @@ public class DataService {
     private static final String humidityPort = "a1";
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private DecimalFormat doubleFormat = new DecimalFormat("#.00");
 
     public List<String> findSensorStartTime() throws ParseException {
         String startTime = sensorStartRepository.findTopByOrderByTimeDesc().getTime();
@@ -41,7 +40,12 @@ public class DataService {
 
         List<String> result = new ArrayList<String>();
         result.add(String.valueOf(hour) + "小时" + String.valueOf(minute) + "分钟");
-        result.add("记录中");
+
+        String dataTime = sensorInfoRepository.findTopByOrderByTimestampDesc().getTimestamp();
+        if (new Date().getTime() - dateFormat.parse(dataTime).getTime() > 60*1000*5)
+            result.add("已关闭");
+        else
+            result.add("记录中");
         return result;
     }
 
@@ -116,7 +120,9 @@ public class DataService {
         List<SensorSimpleInfo> sensorInfoBeanList = new ArrayList<SensorSimpleInfo>();
         for (SensorStatus sensors : sensorStatuses){
             String sensorAddress = sensors.getAddress();
-            List<SensorInfo> infoList = sensorInfoRepository.findTop2ByAddress(sensorAddress);
+            List<SensorInfo> infoList = sensorInfoRepository.findTop2ByAddressOrderByTimestampDesc(sensorAddress);
+            if (infoList.size() == 0)
+                continue;
             sensorInfoBeanList.add(getSimpleSensorInfo(infoList));
         }
         return sensorInfoBeanList;
@@ -250,5 +256,60 @@ public class DataService {
 
         return new SensorDetailInfo(address, temperature, humidity, averageTemperature, averageHumidity,
                 shiftTemperature, shiftHumidity, maxTemperature, minTemperature, maxHumidity, minHumidity);
+    }
+
+    public List<SensorDownloadInfo> findOnlineDownloadInfo(String dataTime, String dataInterval) throws ParseException {
+        // get the online sensor
+        List<SensorStatus> sensorStatuses = sensorStatusRepository.findByStatus(1);
+
+        // the begin time of get data
+        long time = new Date().getTime() - Long.parseLong(dataTime)*60*1000;
+        String date = dateFormat.format(new Date(time));
+
+        // the interval of sample data
+        long interval = Long.parseLong(dataInterval)*1000;
+        Map<String, List<String>> timeData = new HashMap<String, List<String>>();
+
+        // traverse the online status
+        for (SensorStatus sensors : sensorStatuses) {
+            // get sensor info in recent time order by time desc
+            String sensorAddress = sensors.getAddress();
+            List<SensorInfo> sensorInfoList = sensorInfoRepository.findByAddressAndTimestampGreaterThanEqualOrderByTimestampDesc(sensorAddress, date);
+
+            // merge sensor info to simple info
+            List<SensorSimpleInfo> sensorSimpleInfoList = mergeSimpleSensorInfo(sensorInfoList);
+            if (sensorSimpleInfoList.size() == 0)
+                continue;
+
+            // filter data according to the interval
+            sensorSimpleInfoList = filterSensorInfoAccordingInterval(sensorSimpleInfoList, interval);
+
+            for (SensorSimpleInfo simpleInfo : sensorSimpleInfoList){
+                String timestamp = simpleInfo.getTimeStamp();
+                double temperature = simpleInfo.getTemperature();
+                double humidity = simpleInfo.getHumidity();
+                String data = sensorAddress + "#" + doubleFormat.format(temperature) + "#" + doubleFormat.format(humidity);
+
+                if (timeData.containsKey(timestamp)){
+                    List<String> list = timeData.get(timestamp);
+                    list.add(data);
+                    timeData.put(timestamp, list);
+                } else {
+                    List<String> list = new ArrayList<String>();
+                    list.add(data);
+                    timeData.put(timestamp, list);
+                }
+            }
+        }
+
+        // handle to result data
+        List<SensorDownloadInfo> sensorDownloadInfoList = new ArrayList<SensorDownloadInfo>();
+        for (Map.Entry<String, List<String>> entry : timeData.entrySet()){
+            String timestamp = entry.getKey();
+            List<String> values = entry.getValue();
+            sensorDownloadInfoList.add(new SensorDownloadInfo(timestamp, values));
+        }
+
+        return sensorDownloadInfoList;
     }
 }

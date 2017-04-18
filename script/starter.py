@@ -39,7 +39,6 @@ def starter():
             try:
                 # parser info
                 info = parser.parser_info(ser.readlines())
-                print(info)
 
                 # merge info
                 for key, value in info.items():

@@ -111,13 +111,13 @@ function interval_function(){
                 var current_option = sensor_option[sensor]['option'];
                 var current_chart = sensor_option[sensor]['chart'];
 
-                var temp_data = sensor_data_map[sensor]['temperature'] + parseFloat((Math.random()*15).toFixed(1));
-                var humi_data = sensor_data_map[sensor]['humidity'] + parseFloat((Math.random()*60).toFixed(1));
-                var time_data = (new Date()).toLocaleTimeString().replace(/^\D*/,'');
+                var temp_data = sensor_data_map[sensor]['temperature'];
+                var humi_data = sensor_data_map[sensor]['humidity'];
 
                 current_option.series[0].data.push(temp_data);
                 current_option.series[1].data.push(humi_data);
-                //current_option.xAxis.data.push(sensor_data_map[sensor]['timestamp']);
+
+                var time_data = (new Date()).toLocaleTimeString().replace(/^\D*/,'');
                 current_option.xAxis.data.push(time_data);
 
                 if (current_option.xAxis.data.length > 10){
@@ -161,7 +161,7 @@ function interval_function(){
             }
         },
         error: function () {
-            alert("LOAD DATA ERROR!");
+            message_info("数据加载出错", "info", 3);
         }
     });
 }

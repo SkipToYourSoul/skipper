@@ -19,6 +19,7 @@ function message_info(text, type, hide) {
 
 var maxTemp, maxHumi, minTemp, minHumi;
 var $table = $('#all-info-table');
+var $download_table = $('#download-info-table');
 initial(30, 30);
 
 $("#refreshBtn").click(function (evt) {
@@ -66,8 +67,14 @@ function initial(data_time, data_interval){
 
             $("#data-time").html(data_time + " 分钟");
             $("#data-interval").html(data_interval + " 秒");
-            $("#temp-grad").html(maxTemp - minTemp + " °C");
-            $('#humi-grad').html(maxHumi - minHumi + " °RH");
+            if (sensor_data.length == 0){
+                message_info("没有符合条件的读数", "info", 5);
+                $("#temp-grad").html("无数值");
+                $('#humi-grad').html("无数值");
+            } else {
+                $("#temp-grad").html(maxTemp - minTemp + " °C");
+                $('#humi-grad').html(maxHumi - minHumi + " °RH");
+            }
 
             $table.bootstrapTable('hideLoading');
             initTable(sensor_data);
@@ -78,9 +85,6 @@ function initial(data_time, data_interval){
 function initTable(table_data){
     $table.bootstrapTable({
         columns: [{
-            field: 'radio',
-            radio: 'true'
-        },{
             field: 'address',
             sortable: 'true',
             align: 'center',
@@ -90,25 +94,27 @@ function initTable(table_data){
             sortable: 'true',
             align: 'center',
             title: '最新温度',
-            cellStyle: 'temperature_style'
+            cellStyle: 'temperature_style',
+            formatter: 'temperature_formatter'
         },{
             field: 'humidity',
             sortable: 'true',
             align: 'center',
             title: '最新湿度',
-            cellStyle: 'humidity_style'
+            cellStyle: 'humidity_style',
+            formatter: 'humidity_formatter'
         },{
             field: 'averageTemperature',
             sortable: 'true',
             align: 'center',
             title: '平均温度',
-            formatter: 'data_formatter'
+            formatter: 'temperature_formatter'
         },{
             field: 'averageHumidity',
             sortable: 'true',
             align: 'center',
             title: '平均湿度',
-            formatter: 'data_formatter'
+            formatter: 'humidity_formatter'
         },{
             field: 'shiftTemperature',
             sortable: 'true',
@@ -124,8 +130,12 @@ function initTable(table_data){
     });
 }
 
-function data_formatter(value){
+function temperature_formatter(value){
     return value.toFixed(2);
+}
+
+function humidity_formatter(value){
+    return value.toFixed(1);
 }
 
 function temperature_style(value, row, index, field) {
@@ -160,4 +170,105 @@ function humidity_style(value, row, index, field) {
         return minStyle;
     else
         return {};
+}
+
+$('#tableModel').on('shown.bs.modal', function (e) {
+    var time = $('#data-time-select').val();
+    var interval = $('#data-interval-select').val();
+    if (time == "" || interval == ""){
+        message_info("请先选择正确的参数", 'info', 3);
+        $('#tableModel').modal('hide');
+        return;
+    }
+    $.ajax({
+        type: "get",
+        url: "/sensor/overview/download?dataTime=" + time + "&dataInterval=" + interval,
+        dataType: "json",
+        error: function (error_message) {
+            message_info("获取传感器数据错误", "error", 3);
+        },
+        success: function (sensor_data) {
+            if (sensor_data.length == 0){
+                message_info("没有符合条件的数据", "info", 3);
+                return;
+            }
+            $download_table.bootstrapTable('destroy');
+            // add columns
+            var columns = [{
+                field: 'timestamp',
+                sortable: 'true',
+                align: 'center',
+                width: 300,
+                title: '时间戳(yyyy-mm-dd HH:mm:ss)',
+                escape: true,
+                formatter: 'timestamp_formatter'
+            }];
+            var address_list = find_online_sensor_address();
+            for (var row in address_list){
+                var address = address_list[row];
+                columns.push({
+                    field: address + "temp",
+                    sortable: 'true',
+                    align: 'center',
+                    title: address + "温度"
+                });
+                columns.push({
+                    field: address + "humi",
+                    sortable: 'true',
+                    align: 'center',
+                    title: address + "湿度"
+                });
+            }
+
+            // add data
+            var table_data = [];
+            for (var row in sensor_data){
+                var timestamp = sensor_data[row]['timestamp'];
+                var list = sensor_data[row]['list'];
+                var data = {};
+                data['timestamp'] = timestamp;
+
+                for (var i in list){
+                    var address = list[i].split('#')[0];
+                    var temp = list[i].split('#')[1];
+                    var humi = list[i].split('#')[2];
+                    data[address + "temp"] = temp;
+                    data[address + "humi"] = humi;
+                }
+
+                table_data.push(data);
+            }
+
+            // build table
+            $download_table.bootstrapTable({
+                columns: columns,
+                data: table_data
+            });
+        }
+    });
+});
+
+function timestamp_formatter(value){
+    var date = value.split(' ')[0];
+    var time = value.split(' ')[1].split('.')[0];
+    return date + " " + time;
+}
+
+function find_online_sensor_address(){
+    var address = [];
+    $.ajax({
+        type: "get",
+        url: "/sensor/status",
+        dataType: "json",
+        async: false,
+        error: function (error_message) {
+            message_info("获取传感器地址数据错误", "error", 3);
+        },
+        success: function (sensor_data) {
+            for(var row in sensor_data){
+                address.push(sensor_data[row]['address']);
+            }
+        }
+    });
+    return address;
 }

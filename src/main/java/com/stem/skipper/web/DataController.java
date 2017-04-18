@@ -2,6 +2,7 @@ package com.stem.skipper.web;
 
 import com.stem.skipper.domain.SensorStatus;
 import com.stem.skipper.web.bean.SensorDetailInfo;
+import com.stem.skipper.web.bean.SensorDownloadInfo;
 import com.stem.skipper.web.bean.SensorSimpleInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,16 @@ public class DataController {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @GetMapping(value = "/sensor/overview/download")
+    List<SensorDownloadInfo> getDownloadSensorInfo(@RequestParam String dataTime, @RequestParam String dataInterval){
+        try {
+            return service.findOnlineDownloadInfo(dataTime, dataInterval);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

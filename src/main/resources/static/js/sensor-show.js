@@ -38,6 +38,7 @@ for (var i = 0; i < $(".sensor-chart").length; i++){
             show: true,
             feature: {
                 dataView: {readOnly: false},
+                magicType : {show: true, type: ['line', 'bar']},
                 restore: {},
                 saveAsImage: {}
             },
@@ -51,6 +52,9 @@ for (var i = 0; i < $(".sensor-chart").length; i++){
         xAxis: {
             type: 'category',
             axisLine: {
+                show: false
+            },
+            splitLine: {
                 show: false
             },
             data: []
@@ -75,12 +79,12 @@ for (var i = 0; i < $(".sensor-chart").length; i++){
             yAxisIndex: 0,
             data: []
         },
-            {
-                name: '当前湿度',
-                type: 'line',
-                yAxisIndex: 1,
-                data: []
-            }]
+        {
+            name: '当前湿度',
+            type: 'line',
+            yAxisIndex: 1,
+            data: []
+        }]
     };
     var chart = echarts.init(document.getElementById($(".sensor-chart")[i].id), theme[i%4]);
     sensor_option[id] = {

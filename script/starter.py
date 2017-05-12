@@ -6,7 +6,6 @@ Description: Run to monitor serial and insert data into mysql
 """
 
 import script.component as component
-import traceback
 from time import strftime, localtime
 
 # ---- db settings
@@ -21,7 +20,7 @@ db = component.MySQL("mysql-jy")
 
 # ---- insert settings
 sensor_count = db.query("SELECT count(*) FROM " + skipper_status_tbl + " WHERE status = 1")[0][0]
-db_circle = 4
+db_circle = 1
 INSERT_INTERVAL = sensor_count*2*db_circle
 
 
@@ -66,7 +65,7 @@ def starter():
                     time = strftime("%Y-%m-%d %H:%M:%S", localtime())
                     print("Insert data into db at %s\n %s" % (time, db_data))
             except Exception as e:
-                traceback.print_exc(e)
+                print(e)
 
 if __name__ == '__main__':
     import os, sys

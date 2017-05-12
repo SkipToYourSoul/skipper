@@ -10,14 +10,16 @@ import binascii
 class SkipperParser:
     @staticmethod
     def parser_info(port_line_list):
+        max_threshold = 100
+        min_threshold = -100
         data_length = 16
+
         for port_line in port_line_list:
             # transfer port_line to str
             hex_str = binascii.b2a_hex(port_line).decode()
 
             if not hex_str.endswith("ff"):
-                print("Error information: %s" % hex_str)
-                raise Exception('Error Information From Port.')
+                raise Exception('Error Information \'%s\' From Port.' % hex_str)
 
             info = {}
             for position in range(0, len(hex_str), data_length):
@@ -26,7 +28,10 @@ class SkipperParser:
                     send_port = recorder[4:6]
                     receive_port = recorder[6:8]
                     ln_address = recorder[10:12] + recorder[8:10]
-                    data = '%.2f' % float(int(recorder[12:14], 16))
+                    data = float(int(recorder[12:14], 16))
+                    if data > max_threshold or data < min_threshold:
+                        raise Exception('Error recorder data \'%s\'' % recorder)
+                    data = '%.2f' % data
                     info[ln_address + "#" + receive_port] = {
                         "send_port": send_port,
                         "receive_port": receive_port,

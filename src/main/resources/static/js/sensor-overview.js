@@ -107,13 +107,13 @@ function initTable(table_data){
             field: 'averageTemperature',
             sortable: 'true',
             align: 'center',
-            title: '平均温度(°C)',
+            title: '工作温度(°C)',
             formatter: 'temperature_formatter'
         },{
             field: 'averageHumidity',
             sortable: 'true',
             align: 'center',
-            title: '平均湿度(%RH)',
+            title: '工作湿度(%RH)',
             formatter: 'humidity_formatter'
         },{
             field: 'shiftTemperature',

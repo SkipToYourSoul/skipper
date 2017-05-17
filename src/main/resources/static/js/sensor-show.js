@@ -69,7 +69,7 @@ for (var i = 0; i < $(".sensor-chart").length; i++){
             {
                 type: 'value',
                 scale: true,
-                name: '湿度%',
+                name: '湿度%RH',
                 boundaryGap: [0.2, 0.2]
             }
         ],
@@ -115,8 +115,8 @@ function interval_function(){
                 var current_option = sensor_option[sensor]['option'];
                 var current_chart = sensor_option[sensor]['chart'];
 
-                var temp_data = sensor_data_map[sensor]['temperature'];
-                var humi_data = sensor_data_map[sensor]['humidity'];
+                var temp_data = sensor_data_map[sensor]['temperature'].toFixed(2);
+                var humi_data = sensor_data_map[sensor]['humidity'].toFixed(1);
 
                 current_option.series[0].data.push(temp_data);
                 current_option.series[1].data.push(humi_data);
@@ -136,7 +136,7 @@ function interval_function(){
                 var $temp_sensor = $("#sensor-temp-" + sensor.split('-')[2]);
                 var $humi_sensor = $("#sensor-humi-" + sensor.split('-')[2]);
                 $temp_sensor.text(temp_data + '°C');
-                $humi_sensor.text(humi_data + '%');
+                $humi_sensor.text(humi_data + '%RH');
 
                 var temp_upper = $("#sensor-temp-upper-" + sensor.split('-')[2]).text();
                 var temp_lower = $("#sensor-temp-lower-" + sensor.split('-')[2]).text();
@@ -175,15 +175,29 @@ var interval = null;
 $('#start-btn').click(function () {
     var $start_btn = $('#start-btn');
     if ($start_btn.text() == "开始监控"){
-        message_info("监控开始，间隔时间为" + $('#interval-select').val() + "秒", "info", 3);
-        $('#interval-time').text($('#interval-select').val());
-        $('#interval-select').attr("disabled", true);
+        $.ajax({
+                type: "get",
+                url: "/sensor/status/is/monitor",
+                success: function(sensor_data){
+                    if (sensor_data == "已关闭"){
+                        message_info("当前传感器处于关闭状态", "info", 3);
+                    } else {
+                        $select = $('#interval-select');
+                        message_info("监控开始，间隔时间为" + $select.val() + "秒", "info", 3);
+                        $('#interval-time').text($select.val());
+                        $select.attr("disabled", true);
 
-        interval_function();
-        interval = setInterval(interval_function, parseInt($('#interval-select').val()) * 1000);
-        $start_btn.text("停止监控");
-        $start_btn.removeClass("btn-info");
-        $start_btn.addClass("btn-warning");
+                        interval_function();
+                        interval = setInterval(interval_function, parseInt($select.val()) * 1000);
+                        $start_btn.text("停止监控");
+                        $start_btn.removeClass("btn-info");
+                        $start_btn.addClass("btn-warning");
+                    }
+                },
+                error: function (error_status) {
+                    message_info("获取传感器状态出错", "error", 3);
+                }
+        });
     } else if ($start_btn.text() == "停止监控"){
         message_info("监控停止", "info", 3);
         $('#interval-select').attr("disabled", false);

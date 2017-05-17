@@ -61,13 +61,13 @@
                         <div class="row">
                             <div class="col-md-2 col-sm-2">
                                 <div class="row text-center overview-title">
-                                    温度梯度值
+                                    温度差
                                 </div>
                                 <div class="row text-center overview-content" id="temp-grad"></div>
                             </div>
                             <div class="col-md-2 col-sm-2">
                                 <div class="row text-center overview-title">
-                                    湿度梯度值
+                                    湿度差
                                 </div>
                                 <div class="row text-center overview-content" id="humi-grad"></div>
                             </div>
@@ -148,6 +148,14 @@
                            data-pagination-next-text="Next"
                            data-pagination-last-text="Last">
                     </table>
+                    <p style="margin-top: 3px;"><mark>说明：</mark></p>
+                    <ol>
+                        <li>请先选择“数据采样时间”和“测量时间间隔”后点击“刷新传感器数据”开始记录。</li>
+                        <li>工作温度（湿度）：测量期间，该传感器温度（湿度）值的算数平均值。</li>
+                        <li>温度（湿度）波动：测量期间，该传感器温度（湿度）值的最大值－最小值。</li>
+                        <li>温度（湿度）差：同一时刻，各传感器温度（湿度）值的最大值－最小值。</li>
+                        <li>当前温度（湿度）中，红色底纹为当前各传感器温度（湿度）的最大值，蓝色底纹为当前各传感器温度（湿度）的最小值。</li>
+                    </ol>
                 </div>
             </div>
         </div>

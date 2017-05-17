@@ -85,22 +85,26 @@ $table.bootstrapTable({
         field: 'uppertemp',
         sortable: 'true',
         align: 'center',
-        title: '高温阈值(°C)'
+        title: '高温阈值(°C)',
+        formatter: 'temperature_formatter'
     },{
         field: 'lowertemp',
         sortable: 'true',
         align: 'center',
-        title: '低温阈值(°C)'
+        title: '低温阈值(°C)',
+        formatter: 'temperature_formatter'
     },{
         field: 'upperhumi',
         sortable: 'true',
         align: 'center',
-        title: '高湿度阈值(%RH)'
+        title: '高湿度阈值(%RH)',
+        formatter: 'humidity_formatter'
     },{
         field: 'lowerhumi',
         sortable: 'true',
         align: 'center',
-        title: '低湿度阈值(%RH)'
+        title: '低湿度阈值(%RH)',
+        formatter: 'humidity_formatter'
     }],
     onCheck: function (row) {
         $('#address').val(row.address);
@@ -128,6 +132,14 @@ function status_format(value) {
         return "监控中";
     else
         return "已关闭";
+}
+
+function temperature_formatter(value){
+    return value.toFixed(2);
+}
+
+function humidity_formatter(value){
+    return value.toFixed(1);
 }
 
 function status_change() {

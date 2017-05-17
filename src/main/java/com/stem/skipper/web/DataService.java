@@ -66,10 +66,10 @@ public class DataService {
             status = 1;
 
         sensorStatusRepository.save(new SensorStatus(address, status,
-                Integer.valueOf(queryParams.get("uppertemp")),
-                Integer.valueOf(queryParams.get("lowertemp")),
-                Integer.valueOf(queryParams.get("upperhumi")),
-                Integer.valueOf(queryParams.get("lowerhumi"))));
+                Double.valueOf(queryParams.get("uppertemp")),
+                Double.valueOf(queryParams.get("lowertemp")),
+                Double.valueOf(queryParams.get("upperhumi")),
+                Double.valueOf(queryParams.get("lowerhumi"))));
     }
 
     /**
@@ -86,10 +86,10 @@ public class DataService {
             result = 1;
         }
         sensorStatusRepository.save(new SensorStatus(address, status,
-                Integer.valueOf(queryParams.get("upper-temp")),
-                Integer.valueOf(queryParams.get("lower-temp")),
-                Integer.valueOf(queryParams.get("upper-humi")),
-                Integer.valueOf(queryParams.get("lower-humi"))));
+                Double.valueOf(queryParams.get("upper-temp")),
+                Double.valueOf(queryParams.get("lower-temp")),
+                Double.valueOf(queryParams.get("upper-humi")),
+                Double.valueOf(queryParams.get("lower-humi"))));
         return result;
     }
 

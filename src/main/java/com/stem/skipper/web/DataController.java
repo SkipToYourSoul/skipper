@@ -94,4 +94,19 @@ public class DataController {
         }
         return message;
     }
+
+    /**
+     * return the status that sensor is in monitor status or not
+     * @return
+     */
+    @GetMapping(value = "/sensor/status/is/monitor")
+    String isSensorMonitor() throws ParseException {
+        String result = "已关闭";
+        try {
+            return service.findSensorStartTime().get(1);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "error";
+        }
+    }
 }

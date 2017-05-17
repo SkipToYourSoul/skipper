@@ -85,22 +85,22 @@ $table.bootstrapTable({
         field: 'uppertemp',
         sortable: 'true',
         align: 'center',
-        title: '高温阈值'
+        title: '高温阈值(°C)'
     },{
         field: 'lowertemp',
         sortable: 'true',
         align: 'center',
-        title: '低温阈值'
+        title: '低温阈值(°C)'
     },{
         field: 'upperhumi',
         sortable: 'true',
         align: 'center',
-        title: '高湿度阈值'
+        title: '高湿度阈值(%RH)'
     },{
         field: 'lowerhumi',
         sortable: 'true',
         align: 'center',
-        title: '低湿度阈值'
+        title: '低湿度阈值(%RH)'
     }],
     onCheck: function (row) {
         $('#address').val(row.address);

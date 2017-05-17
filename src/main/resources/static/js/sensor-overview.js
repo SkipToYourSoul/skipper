@@ -72,8 +72,8 @@ function initial(data_time, data_interval){
                 $("#temp-grad").html("无数值");
                 $('#humi-grad').html("无数值");
             } else {
-                $("#temp-grad").html(maxTemp - minTemp + " °C");
-                $('#humi-grad').html(maxHumi - minHumi + " °RH");
+                $("#temp-grad").html((maxTemp - minTemp).toFixed(2) + " °C");
+                $('#humi-grad').html((maxHumi - minHumi).toFixed(1) + " %RH");
             }
 
             $table.bootstrapTable('hideLoading');
@@ -93,38 +93,40 @@ function initTable(table_data){
             field: 'temperature',
             sortable: 'true',
             align: 'center',
-            title: '最新温度',
+            title: '最新温度(°C)',
             cellStyle: 'temperature_style',
             formatter: 'temperature_formatter'
         },{
             field: 'humidity',
             sortable: 'true',
             align: 'center',
-            title: '最新湿度',
+            title: '最新湿度(%RH)',
             cellStyle: 'humidity_style',
             formatter: 'humidity_formatter'
         },{
             field: 'averageTemperature',
             sortable: 'true',
             align: 'center',
-            title: '平均温度',
+            title: '平均温度(°C)',
             formatter: 'temperature_formatter'
         },{
             field: 'averageHumidity',
             sortable: 'true',
             align: 'center',
-            title: '平均湿度',
+            title: '平均湿度(%RH)',
             formatter: 'humidity_formatter'
         },{
             field: 'shiftTemperature',
             sortable: 'true',
             align: 'center',
-            title: '温度波动'
+            title: '温度波动(°C)',
+            formatter: 'temperature_formatter'
         },{
             field: 'shiftHumidity',
             sortable: 'true',
             align: 'center',
-            title: '湿度波动'
+            title: '湿度波动(%RH)',
+            formatter: 'humidity_formatter'
         }],
         data: table_data
     });
@@ -230,8 +232,8 @@ $('#tableModel').on('shown.bs.modal', function (e) {
 
                 for (var i in list){
                     var address = list[i].split('#')[0];
-                    var temp = list[i].split('#')[1];
-                    var humi = list[i].split('#')[2];
+                    var temp = parseFloat(list[i].split('#')[1]).toFixed(2);
+                    var humi = parseFloat(list[i].split('#')[2]).toFixed(1);
                     data[address + "temp"] = temp;
                     data[address + "humi"] = humi;
                 }

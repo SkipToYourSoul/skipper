@@ -284,8 +284,11 @@ public class DataService {
             // filter data according to the interval
             sensorSimpleInfoList = filterSensorInfoAccordingInterval(sensorSimpleInfoList, interval);
 
+            String firstTime = sensorSimpleInfoList.get(0).getTimeStamp();
+            long firstTimeMills = dateFormat.parse(firstTime).getTime();
+            int timeCount = 0;
             for (SensorSimpleInfo simpleInfo : sensorSimpleInfoList){
-                String timestamp = simpleInfo.getTimeStamp();
+                String timestamp = dateFormat.format(firstTimeMills - interval*(timeCount++));
                 double temperature = simpleInfo.getTemperature();
                 double humidity = simpleInfo.getHumidity();
                 String data = sensorAddress + "#" + doubleFormat.format(temperature) + "#" + doubleFormat.format(humidity);

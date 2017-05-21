@@ -13,4 +13,3 @@ target/
 
 # config file
 script/common.conf
-src/main/resources/application.properties

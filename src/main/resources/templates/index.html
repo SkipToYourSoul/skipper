@@ -54,7 +54,16 @@
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                 <h2 class="sub-header">
                     <span class="glyphicon glyphicon-list" aria-hidden="true"></span> 数据概览页面
+                    <select class="selectpicker" id="equipment-select">
+                        <option value="1">设备1</option>
+                        <option value="2">设备2</option>
+                        <option value="3">设备3</option>
+                        <option value="4">设备4</option>
+                        <option value="5">设备5</option>
+                        <option value="6">设备6</option>
+                    </select>
                 </h2>
+
                 <!-- overview -->
                 <div class="panel panel-default">
                     <div class="panel-body">
@@ -91,7 +100,7 @@
                             </div>
                             <div class="col-md-2 col-sm-2">
                                 <div class="row text-center overview-title">
-                                    记录状态
+                                    当前记录状态
                                 </div>
                                 <div class="row text-center overview-content" id="data-status" th:text="${status}"></div>
                             </div>

@@ -39,13 +39,14 @@ public class DataService {
         long minute = (interval - hour*3600*1000) / 1000 / 60;
 
         List<String> result = new ArrayList<String>();
-        result.add(String.valueOf(hour) + "小时" + String.valueOf(minute) + "分钟");
-
         String dataTime = sensorInfoRepository.findTopByOrderByTimestampDesc().getTimestamp();
-        if (new Date().getTime() - dateFormat.parse(dataTime).getTime() > 60*1000*5)
+        if (new Date().getTime() - dateFormat.parse(dataTime).getTime() > 60*1000*5) {
+            result.add("-");
             result.add("已关闭");
-        else
+        } else {
+            result.add(String.valueOf(hour) + "小时" + String.valueOf(minute) + "分钟");
             result.add("记录中");
+        }
         return result;
     }
 
@@ -60,12 +61,13 @@ public class DataService {
     public void changeSensorStatus(Map<String, String> queryParams){
         String address = queryParams.get("address");
         int status = Integer.valueOf(queryParams.get("status"));
+        String equipment = "设备1";
         if (status == 1)
             status = 0;
         else
             status = 1;
 
-        sensorStatusRepository.save(new SensorStatus(address, status,
+        sensorStatusRepository.save(new SensorStatus(address, status, equipment,
                 Double.valueOf(queryParams.get("uppertemp")),
                 Double.valueOf(queryParams.get("lowertemp")),
                 Double.valueOf(queryParams.get("upperhumi")),
@@ -78,6 +80,7 @@ public class DataService {
      */
     public int modifySensorStatus(Map<String, String> queryParams){
         String address = queryParams.get("address");
+        String equipment = "设备1";
         SensorStatus sensorStatus = sensorStatusRepository.findByAddress(address);
         int result = 0;
         int status = 0;
@@ -85,7 +88,7 @@ public class DataService {
             status = sensorStatus.getStatus();
             result = 1;
         }
-        sensorStatusRepository.save(new SensorStatus(address, status,
+        sensorStatusRepository.save(new SensorStatus(address, status, equipment,
                 Double.valueOf(queryParams.get("upper-temp")),
                 Double.valueOf(queryParams.get("lower-temp")),
                 Double.valueOf(queryParams.get("upper-humi")),

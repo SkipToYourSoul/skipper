@@ -1,4 +1,4 @@
-body{background: #eee url(http://subtlepatterns.com/patterns/sativa.png);}
+body{background: #eee /*url(http://subtlepatterns.com/patterns/sativa.png);*/}
 html,body{
     position: relative;
     height: 100%;
@@ -56,11 +56,11 @@ html,body{
 
 .avatar{
     width: 100px;height: 100px;
-    margin: 10px auto 30px;
-    border-radius: 100%;
-    border: 2px solid #aaa;
+    margin: 10px auto 10px;
+    /*border-radius: 100%;
+    border: 2px solid #aaa;*/
     background-size: cover;
-    background-image: url(../smile.jpg)
+    background-image: url(../logo.jpg)
 }
 
 .form-box input{

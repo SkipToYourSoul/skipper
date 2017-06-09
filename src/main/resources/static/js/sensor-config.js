@@ -82,6 +82,11 @@ $table.bootstrapTable({
         cellStyle: 'status_style',
         formatter: 'status_format'
     },{
+        field: 'equipment',
+        sortable: 'true',
+        align: 'center',
+        title: '设备分组'
+    },{
         field: 'uppertemp',
         sortable: 'true',
         align: 'center',

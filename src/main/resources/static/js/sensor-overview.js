@@ -32,6 +32,20 @@ $("#refreshBtn").click(function (evt) {
    initial(time, interval);
 });
 
+/*
+*   change equipment
+* */
+$('#equipment-select').change(function (evt) {
+    var value = $('#equipment-select').val();
+    if (value == 1) {
+        $(location).attr('href', '');
+    } else {
+        $("#data-status").html("已关闭");
+        $("#data-period").html("-");
+        $table.bootstrapTable('removeAll');
+    }
+});
+
 /**
  * data of overview content
  */

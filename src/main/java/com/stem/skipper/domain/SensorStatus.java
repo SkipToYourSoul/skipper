@@ -14,14 +14,16 @@ public class SensorStatus {
     @Id
     private String address;
     private int status;
+    private String equipment;
     private double uppertemp;
     private double lowertemp;
     private double upperhumi;
     private double lowerhumi;
 
-    public SensorStatus(String address, int status, double uppertemp, double lowertemp, double upperhumi, double lowerhumi) {
+    public SensorStatus(String address, int status, String equipment, double uppertemp, double lowertemp, double upperhumi, double lowerhumi) {
         this.address = address;
         this.status = status;
+        this.equipment = equipment;
         this.uppertemp = uppertemp;
         this.lowertemp = lowertemp;
         this.upperhumi = upperhumi;
@@ -44,6 +46,14 @@ public class SensorStatus {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getEquipment() {
+        return equipment;
+    }
+
+    public void setEquipment(String equipment) {
+        this.equipment = equipment;
     }
 
     public double getUppertemp() {
@@ -83,6 +93,7 @@ public class SensorStatus {
         return "SensorStatus{" +
                 "address='" + address + '\'' +
                 ", status=" + status +
+                ", equipment='" + equipment + '\'' +
                 ", uppertemp=" + uppertemp +
                 ", lowertemp=" + lowertemp +
                 ", upperhumi=" + upperhumi +

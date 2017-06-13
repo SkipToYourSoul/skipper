@@ -5,6 +5,11 @@ Creation Date: 2017/3/25
 Description: Run to monitor serial and insert data into mysql
 """
 
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
+
 import script.component as component
 from time import strftime, localtime
 
@@ -20,7 +25,7 @@ db = component.MySQL("mysql-jy")
 
 # ---- insert settings
 sensor_count = db.query("SELECT count(*) FROM " + skipper_status_tbl + " WHERE status = 1")[0][0]
-db_circle = 1
+db_circle = 2
 INSERT_INTERVAL = sensor_count*2*db_circle
 
 

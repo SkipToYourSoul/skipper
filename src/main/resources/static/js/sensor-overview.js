@@ -23,13 +23,15 @@ var $download_table = $('#download-info-table');
 initial(30, 30);
 
 $("#refreshBtn").click(function (evt) {
-   var time = $('#data-time-select').val();
-   var interval = $('#data-interval-select').val();
-   if (time == "" || interval == ""){
-       message_info("请先选择正确的参数", 'info', 3);
-       return;
-   }
-   initial(time, interval);
+    if ($('#equipment-select').val() != "1")
+        return;
+    var time = $('#data-time-select').val();
+    var interval = $('#data-interval-select').val();
+    if (time == "" || interval == ""){
+        message_info("请先选择正确的参数", 'info', 3);
+        return;
+    }
+    initial(time, interval);
 });
 
 /*
@@ -42,6 +44,10 @@ $('#equipment-select').change(function (evt) {
     } else {
         $("#data-status").html("已关闭");
         $("#data-period").html("-");
+        $("#temp-grad").html("-");
+        $("#humi-grad").html("-");
+        $("#data-time").html("-");
+        $("#data-interval").html("-");
         $table.bootstrapTable('removeAll');
     }
 });

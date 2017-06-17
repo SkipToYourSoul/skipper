@@ -3,41 +3,97 @@
 Author: liye@qiyi.com
 Creation Date: 2017/3/25
 Description: Some basic operation of parser port's information
+    data format: FE 06 90 A0 A0 0F 6C 8B FF
+        head: FE
+        data length: 06
+        send port: 90
+        receive port: A0(temperature)/A1(humidity)
+        address: A0 0F (0x0FA0)
+        data: 6C 8B (FF -> FE FD, FE -> FE FC)
+        tail: FF
 """
 import binascii
 
 
-class SkipperParser:
-    @staticmethod
-    def parser_info(port_line_list):
-        max_threshold = 100
-        min_threshold = -100
-        data_length = 16
+def humidity_parser(param):
+    data = float(int(param, 16))
+    return 100*data/65535
 
+
+def temperature_parser(param):
+    data = float(int(param, 16))
+    return 175*data/65535 - 45
+
+
+# data: 6C 8B (FF -> FE FD, FE -> FE FC)
+# handle data
+def transfer_data_to_base_format(param):
+    if len(param) == 4:
+        return param
+    else:
+        param = param.replace("FEFD", "FF")
+        param = param.replace("FEFC", "FE")
+        if len(param) == 4:
+            return param
+
+    return None
+
+
+class SkipperParser:
+    # threshold
+    max_tmp_threshold = 125
+    min_tmp_threshold = -40
+    max_hum_threshold = 257
+    min_hum_threshold = -40
+
+    data_byte_length = 4
+    data_package_length = data_byte_length + 14
+
+    @staticmethod
+    def parser_info(port_line_list, max_tmp_threshold=max_tmp_threshold, min_tmp_threshold=min_tmp_threshold,
+                    max_hum_threshold=max_hum_threshold, min_hum_threshold=min_hum_threshold):
         for port_line in port_line_list:
             # transfer port_line to str
-            hex_str = binascii.b2a_hex(port_line).decode()
+            recorder = binascii.b2a_hex(port_line).decode()
+            # recorder = port_line
+            recorder = recorder.upper()
+            # print(recorder)
 
-            if not hex_str.endswith("ff"):
-                raise Exception('Error Information \'%s\' From Port.' % hex_str)
+            # check recorder
+            if recorder == "":
+                continue
+
+            if len(recorder) < SkipperParser.data_package_length:
+                continue
+
+            if not recorder.endswith("ff") and not recorder.endswith("FF"):
+                raise Exception('Error Information \'%s\' From Port.' % recorder)
 
             info = {}
-            for position in range(0, len(hex_str), data_length):
-                recorder = hex_str[position: position + data_length]
-                if recorder != "":
-                    send_port = recorder[4:6]
-                    receive_port = recorder[6:8]
-                    ln_address = recorder[10:12] + recorder[8:10]
-                    data = float(int(recorder[12:14], 16))
-                    if data > max_threshold or data < min_threshold:
-                        raise Exception('Error recorder data \'%s\'' % recorder)
-                    data = '%.2f' % data
-                    info[ln_address + "#" + receive_port] = {
-                        "send_port": send_port,
-                        "receive_port": receive_port,
-                        "ln_address": ln_address,
-                        "data": data
-                    }
+            send_port = recorder[4:6]
+            receive_port = recorder[6:8]
+            ln_address = recorder[10:12] + recorder[8:10]
+            data = transfer_data_to_base_format(recorder[12:(len(recorder)-2)])
+            if data is None:
+                raise Exception('Error format data \'%s\'' % data)
+
+            if receive_port == "A0":
+                data = temperature_parser(data)
+                if data > max_tmp_threshold or data < min_tmp_threshold:
+                    raise Exception('Error temperature recorder data \'%s\'' % recorder)
+            elif receive_port == "A1":
+                data = humidity_parser(data)
+                if data > max_hum_threshold or data < min_hum_threshold:
+                    raise Exception('Error humidity recorder data \'%s\'' % recorder)
+
+            data = '%.2f' % data
+
+            info[ln_address + "#" + receive_port] = {
+                "send_port": send_port,
+                "receive_port": receive_port,
+                "ln_address": ln_address,
+                "data": data
+            }
         return info
 
     @staticmethod
@@ -50,3 +106,7 @@ class SkipperParser:
             data = info[recorder]['data']
             db_data.append((ln_address, send_port, receive_port, data))
         return db_data
+
+
+if __name__ == "__main__":
+    print(SkipperParser.parser_info(["fe0690a0a00f6cfefcff"]))

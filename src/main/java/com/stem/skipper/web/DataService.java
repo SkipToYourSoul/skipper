@@ -26,8 +26,8 @@ public class DataService {
     @Autowired
     SensorStartRepository sensorStartRepository;
 
-    private static final String temperaturePort = "a0";
-    private static final String humidityPort = "a1";
+    private static final String temperaturePort = "A0";
+    private static final String humidityPort = "A1";
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private DecimalFormat doubleFormat = new DecimalFormat("#.00");

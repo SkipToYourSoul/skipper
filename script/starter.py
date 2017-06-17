@@ -12,6 +12,20 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
 import script.component as component
 from time import strftime, localtime
+import logging
+
+# ---- logging settings
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    filename='./port.log.' + strftime("%Y%m%d%H", localtime()),
+                    filemode='w')
+
+# print error log to console
+console = logging.StreamHandler()
+console.setLevel(logging.ERROR)
+console.setFormatter(logging.Formatter('%(asctime)s %(filename)s[line:%(lineno)d] %(message)s'))
+logging.getLogger('').addHandler(console)
 
 # ---- db settings
 skipper_data_tbl = "skipper"
@@ -19,9 +33,12 @@ skipper_info_tbl = "skipper_info"
 skipper_status_tbl = "skipper_status"
 
 # --- basic tools
-parser = component.SkipperParser()
-port = component.SkipperPort()
-db = component.MySQL("mysql-jy")
+try:
+    parser = component.SkipperParser()
+    port = component.SkipperPort()
+    db = component.MySQL("mysql-jy")
+except Exception as e:
+    logging.error(e, stack_info=True)
 
 # ---- insert settings
 sensor_count = db.query("SELECT count(*) FROM " + skipper_status_tbl + " WHERE status = 1")[0][0]
@@ -47,7 +64,6 @@ def starter():
                 # merge info
                 for key, value in info.items():
                     merge_info[key] = value
-                print(merge_info)
 
                 if insert_interval > 0:
                     insert_interval -= 1
@@ -59,8 +75,8 @@ def starter():
                     db_data = parser.transfer_to_db_format(merge_info)
 
                     # insert to mysql
-                    sql = "INSERT INTO " + skipper_data_tbl + \
-                          " (address, send_port, receive_port, value) values (%s, %s, %s, %s)"
+                    sql = "INSERT INTO {0} (address, send_port, receive_port, value) values (%s, %s, %s, %s)"\
+                        .format(skipper_data_tbl)
                     db.executemany(sql, db_data)
 
                     # update variables
@@ -68,12 +84,11 @@ def starter():
                     merge_info.clear()
 
                     time = strftime("%Y-%m-%d %H:%M:%S", localtime())
-                    print("Insert data into db at %s\n %s" % (time, db_data))
+                    logging.info("Insert data into db at %s\n %s" % (time, db_data))
             except Exception as e:
-                print(e)
+                logging.error(e)
 
 if __name__ == '__main__':
-    import os, sys
     os.chdir(sys.path[0])
 
     starter()

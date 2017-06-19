@@ -14,12 +14,13 @@ Description: Some basic operation of parser port's information
 """
 import binascii
 import logging
+import sys
 from time import strftime, localtime
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
-                    filename='../port.log.' + strftime("%Y%m%d%H", localtime()),
+                    filename=sys.path[0] + '/port.log.' + strftime("%Y%m%d%H", localtime()),
                     filemode='w')
 
 

@@ -17,7 +17,7 @@ function message_info(text, type, hide) {
     });
 }
 
-var maxTemp, maxHumi, minTemp, minHumi;
+var maxTemp = -40, maxHumi = -40, minTemp = 125, minHumi = 257;
 var $table = $('#all-info-table');
 var $download_table = $('#download-info-table');
 initial(30, 30);
@@ -68,10 +68,6 @@ function initial(data_time, data_interval){
         },
         success: function (sensor_data) {
             var tempGrads = 0; var humiGrads = 0;
-            maxTemp = 0.0;
-            maxHumi = 0.0;
-            minTemp = 100.0;
-            minHumi = 100.0;
             for (var i in sensor_data){
                 var row = sensor_data[i];
                 var address = row['address'];
@@ -80,9 +76,9 @@ function initial(data_time, data_interval){
                 if (row['temperature'] < minTemp)
                     minTemp = row['temperature'];
                 if (row['humidity'] > maxHumi)
-                    maxHumi = row['humidity'];
+                    maxHumi = row['humidity'].toFixed(1);
                 if (row['humidity'] < minHumi)
-                    minHumi = row['humidity'];
+                    minHumi = row['humidity'].toFixed(1);
             }
 
             $("#data-time").html(data_time + " 分钟");

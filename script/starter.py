@@ -18,7 +18,7 @@ import logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
-                    filename='./port.log.' + strftime("%Y%m%d%H", localtime()),
+                    filename=sys.path[0] + '/port.log.' + strftime("%Y%m%d%H", localtime()),
                     filemode='w')
 
 # print error log to console
@@ -31,6 +31,11 @@ logging.getLogger('').addHandler(console)
 skipper_data_tbl = "skipper"
 skipper_info_tbl = "skipper_info"
 skipper_status_tbl = "skipper_status"
+
+# ---- print information
+os.chdir(sys.path[0])
+print("Server start, current path is " + sys.path[0])
+print("Monitoring, more information will show in " + sys.path[0] + '\port.log.')
 
 # --- basic tools
 try:
@@ -89,6 +94,4 @@ def starter():
                 logging.error(e)
 
 if __name__ == '__main__':
-    os.chdir(sys.path[0])
-
     starter()

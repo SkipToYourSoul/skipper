@@ -62,12 +62,19 @@ class SkipperParser:
     def parser_info(port_line_list, max_tmp_threshold=max_tmp_threshold, min_tmp_threshold=min_tmp_threshold,
                     max_hum_threshold=max_hum_threshold, min_hum_threshold=min_hum_threshold):
         info = {}
+        recorders = ""
         for port_line in port_line_list:
             # transfer port_line to str
             recorder = binascii.b2a_hex(port_line).decode()
             # recorder = port_line
             recorder = recorder.upper()
             # print(recorder)
+            recorders += recorder
+
+        while recorders.find("FF") != -1:
+            position = recorders.find("FF")
+            recorder = recorders[:position+2]
+            recorders = recorders[position+2:]
 
             # check recorder
             if len(recorder) == 0 or len(recorder) < SkipperParser.data_package_length:
@@ -76,6 +83,7 @@ class SkipperParser:
 
             if not recorder.endswith("ff") and not recorder.endswith("FF"):
                 logging.warning('Error Recorder \'%s\' From Port.' % recorder)
+                continue
 
             send_port = recorder[4:6]
             receive_port = recorder[6:8]
@@ -119,8 +127,8 @@ class SkipperParser:
 
 
 if __name__ == "__main__":
-    logging.info(SkipperParser.parser_info(["fe0690a0a00f6cfefdff"]))
     try:
+        logging.info(SkipperParser.parser_info(["fe0690a0a00f6cfefdff"]))
         raise Exception('test')
     except Exception as e:
         logging.error(e, stack_info=True)

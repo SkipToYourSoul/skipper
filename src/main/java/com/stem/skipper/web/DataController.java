@@ -38,6 +38,12 @@ public class DataController {
         return service.findAllSensorStatus();
     }
 
+    /**
+     * newest data in overview page
+     * @param dataTime
+     * @param dataInterval
+     * @return
+     */
     @GetMapping(value = "/sensor/overview/data")
     List<SensorDetailInfo> getDetailSensorInfo(@RequestParam String dataTime, @RequestParam String dataInterval){
         try {
@@ -48,6 +54,12 @@ public class DataController {
         }
     }
 
+    /**
+     * download data
+     * @param dataTime
+     * @param dataInterval
+     * @return
+     */
     @GetMapping(value = "/sensor/overview/download")
     List<SensorDownloadInfo> getDownloadSensorInfo(@RequestParam String dataTime, @RequestParam String dataInterval){
         try {

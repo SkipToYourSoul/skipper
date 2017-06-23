@@ -35,7 +35,7 @@ skipper_status_tbl = "skipper_status"
 # ---- print information
 os.chdir(sys.path[0])
 print("Server start, current path is " + sys.path[0])
-print("Monitoring, more information will show in " + sys.path[0] + '\port.log.')
+print("Monitoring, more information will show in " + sys.path[0] + '\port.log.YYYYMMDDHH')
 
 # --- basic tools
 try:

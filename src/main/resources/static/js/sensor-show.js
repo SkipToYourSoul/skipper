@@ -106,8 +106,7 @@ function interval_function(){
                 var row = sensor_data[i];
                 sensor_data_map['sensor-chart-' + row.address] = {
                     'temperature' : row.temperature,
-                    'humidity' : row.humidity,
-                    'timestamp' : row.timeStamp
+                    'humidity' : row.humidity
                 }
             }
 

@@ -47,7 +47,7 @@ except Exception as e:
 
 # ---- insert settings
 sensor_count = db.query("SELECT count(*) FROM " + skipper_status_tbl + " WHERE status = 1")[0][0]
-db_circle = 2
+db_circle = 4
 INSERT_INTERVAL = sensor_count*2*db_circle
 
 

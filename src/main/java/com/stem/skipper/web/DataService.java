@@ -190,16 +190,19 @@ public class DataService {
 
     private List<SensorSimpleInfo> mergeSimpleSensorInfo(List<SensorInfo> infoList){
         List<SensorSimpleInfo> simpleList = new ArrayList<SensorSimpleInfo>();
-        for (int i=0; i<infoList.size(); i+=2){
+        if (infoList.size() == 0)
+            return simpleList;
+
+        String address = infoList.get(0).getAddress();
+        for (int i=0; i<infoList.size(); i++){
             if (i+1 >= infoList.size())
                 break;
             if (!infoList.get(i).getTimestamp().equals(infoList.get(i+1).getTimestamp()))
                 continue;
             SensorInfo info = infoList.get(i);
-            String address = info.getAddress();
             String timeStamp = info.getTimestamp();
-            double temperature = -1.0;
-            double humidity = -1.0;
+            double temperature = -100.0;
+            double humidity = -100.0;
             if (info.getReceive_port().equals(temperaturePort)) {
                 temperature = info.getValue();
                 humidity = infoList.get(i+1).getValue();
@@ -208,7 +211,8 @@ public class DataService {
                 humidity = info.getValue();
                 temperature = infoList.get(i+1).getValue();
             }
-            simpleList.add(new SensorSimpleInfo(address, temperature, humidity, timeStamp));
+            if (temperature != -100.0 && humidity != -100.0)
+                simpleList.add(new SensorSimpleInfo(address, temperature, humidity, timeStamp));
         }
         return simpleList;
     }
